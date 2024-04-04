@@ -11,8 +11,9 @@ import net.minestom.server.entity.ai.goal.MeleeAttackGoal;
 import net.minestom.server.entity.ai.target.ClosestEntityTarget;
 import net.minestom.server.entity.metadata.monster.raider.EvokerMeta;
 import net.minestom.server.entity.metadata.monster.raider.SpellcasterIllagerMeta;
+import net.minestom.server.network.packet.server.play.ParticlePacket;
 import net.minestom.server.particle.Particle;
-import net.minestom.server.particle.ParticleCreator;
+
 import net.minestom.server.timer.TaskSchedule;
 import net.minestom.server.utils.time.Cooldown;
 import net.minestom.server.utils.time.TimeUnit;
@@ -49,8 +50,8 @@ final class EvokerMob extends ArenaMob {
                                     random.nextFloat(-2, 2)
                             );
                             silverfish.setInstance(instance, pos);
-                            instance.sendGroupedPacket(ParticleCreator.createParticlePacket(
-                                    Particle.POOF, true, pos.x(), pos.y(), pos.z(),
+                            instance.sendGroupedPacket(new ParticlePacket(
+                                    Particle.POOF.id(), true, pos.x(), pos.y(), pos.z(),
                                     0.2f, 0.2f, 0.2f, 0.1f, 10, null
                             ));
                         }

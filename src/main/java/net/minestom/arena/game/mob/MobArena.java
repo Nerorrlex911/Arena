@@ -26,8 +26,10 @@ import net.minestom.server.attribute.AttributeOperation;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.*;
+import net.minestom.server.entity.damage.Damage;
 import net.minestom.server.entity.damage.DamageType;
-import net.minestom.server.entity.metadata.arrow.ArrowMeta;
+
+import net.minestom.server.entity.metadata.projectile.ArrowMeta;
 import net.minestom.server.event.entity.EntityAttackEvent;
 import net.minestom.server.event.entity.EntityDeathEvent;
 import net.minestom.server.event.entity.projectile.ProjectileCollideWithEntityEvent;
@@ -39,8 +41,9 @@ import net.minestom.server.event.player.PlayerEntityInteractEvent;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
+import net.minestom.server.network.packet.server.play.ParticlePacket;
 import net.minestom.server.particle.Particle;
-import net.minestom.server.particle.ParticleCreator;
+
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.tag.Tag;
 import net.minestom.server.timer.TaskSchedule;
@@ -600,13 +603,12 @@ public final class MobArena implements SingleInstanceArena {
                                 !instance.getWorldBorder().isInside(pos) ||
                                 age >= 30) {
 
-                            explosion(DamageType.fromPlayer(player), instance, pos, 5, 0.5f, 7, 1);
+                            explosion(Damage.fromPlayer(player,7), instance, pos, 5, 0.5f,  1);
 
                             return TaskSchedule.stop();
                         }
-
-                        instance.sendGroupedPacket(ParticleCreator.createParticlePacket(
-                                Particle.FIREWORK, true, pos.x(), pos.y(), pos.z(),
+                        instance.sendGroupedPacket(new ParticlePacket(
+                                Particle.FIREWORK.id(), true, pos.x(), pos.y(), pos.z(),
                                 0.3f, 0.3f, 0.3f, 0.01f, 50, null
                         ));
                         instance.playSound(
@@ -627,24 +629,24 @@ public final class MobArena implements SingleInstanceArena {
 
                 final Instance instance = event.getInstance();
                 final Pos pos = target.getPosition();
-                explosion(DamageType.fromProjectile(shooter, projectile), instance, pos, 6, 1, 7, 0.3f);
+                explosion(Damage.fromProjectile(shooter, projectile,7), instance, pos, 6, 1,  0.3f);
             }).addListener(EntityAttackEvent.class, event -> {
                 if (!(event.getEntity() instanceof Player player)) return;
                 if (!(event.getTarget() instanceof LivingEntity target)) return;
 
                 final Instance instance = event.getInstance();
                 final Pos pos = target.getPosition();
-                explosion(DamageType.fromPlayer(player), instance, pos, 3, 1f, 3, 0.3f);
+                explosion(Damage.fromPlayer(player,3), instance, pos, 3, 1f, 0.3f);
             }));
         }
 
         return features;
     }
 
-    private static void explosion(DamageType damageType, Instance instance, Pos pos, int range, float offset, int damage, float volume) {
-        instance.sendGroupedPacket(ParticleCreator.createParticlePacket(
+    private static void explosion(Damage damage, Instance instance, Pos pos, int range, float offset, float volume) {
+        instance.sendGroupedPacket(new ParticlePacket(
                 Particle.EXPLOSION, pos.x(), pos.y(), pos.z(),
-                offset, offset, offset, 5
+                offset, offset, offset, 0.01f,5
         ));
         instance.playSound(
                 Sound.sound(SoundEvent.ENTITY_GENERIC_EXPLODE, Sound.Source.NEUTRAL, volume, 1),
@@ -652,7 +654,7 @@ public final class MobArena implements SingleInstanceArena {
         );
         for (Entity entity : instance.getNearbyEntities(pos, range)) {
             if (entity instanceof LivingEntity livingEntity && !(entity instanceof Player))
-                livingEntity.damage(damageType, damage);
+                livingEntity.damage(damage);
         }
     }
 }
