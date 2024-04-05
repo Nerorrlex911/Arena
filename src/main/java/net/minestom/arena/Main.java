@@ -1,5 +1,6 @@
 package net.minestom.arena;
 
+import net.hollowcube.minestom.extensions.ExtensionBootstrap;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -28,6 +29,7 @@ import net.minestom.server.monitoring.TickMonitor;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.timer.TaskSchedule;
 import net.minestom.server.utils.MathUtils;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +42,7 @@ final class Main {
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) {
-        MinecraftServer minecraftServer = MinecraftServer.init();
+        @NotNull ExtensionBootstrap minecraftServer = ExtensionBootstrap.init();
         if (CONFIG.prometheus().enabled()) Metrics.init();
 
         try {

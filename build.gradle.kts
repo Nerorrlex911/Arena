@@ -26,6 +26,7 @@ dependencies {
     implementation("io.prometheus:simpleclient_hotspot:0.16.0")
     implementation("io.prometheus:simpleclient_httpserver:0.16.0")
     implementation("net.kyori:adventure-text-minimessage:4.12.0")
+    implementation("dev.hollowcube:minestom-ce-extensions:1.2.0")
 }
 
 tasks.withType<JavaCompile> {
